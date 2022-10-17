@@ -4,6 +4,7 @@ import com.nttdata.bootcamp.msaccount.dto.CurrentAccountDTO;
 import com.nttdata.bootcamp.msaccount.dto.FixedTermDepositAccountDTO;
 import com.nttdata.bootcamp.msaccount.dto.SavingsAccountDTO;
 import com.nttdata.bootcamp.msaccount.model.Account;
+import com.nttdata.bootcamp.msaccount.model.Transaction;
 import com.nttdata.bootcamp.msaccount.service.impl.AccountServiceImpl;
 import lombok.extern.log4j.Log4j2;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -24,6 +25,12 @@ public class AccountController {
     @ResponseBody
     public Flux<Account> findAllAccounts() {
         return accountService.findAll();
+    }
+
+    @GetMapping(value = "/findAllAccountsByClientId/{id}")
+    @ResponseBody
+    public Flux<Account> findAllAccountsByClientId(@PathVariable Integer id) {
+        return accountService.findAllByClientId(id);
     }
 
     @PostMapping(value = "/createSavingsAccount")

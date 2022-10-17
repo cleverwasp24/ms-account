@@ -21,6 +21,9 @@ public class TransactionServiceImpl implements TransactionService {
     @Autowired
     private TransactionRepository transactionRepository;
 
+    @Autowired
+    private AccountServiceImpl accountService;
+
     private TransactionDTOMapper transactionDTOMapper = new TransactionDTOMapper();
 
     @Override
@@ -65,8 +68,20 @@ public class TransactionServiceImpl implements TransactionService {
     public Mono<TransactionDTO> createTransaction(TransactionDTO transactionDTO) {
         log.info("Creating transaction: " + transactionDTO.toString());
         Transaction transaction = transactionDTOMapper.convertToEntity(transactionDTO);
-        return transactionRepository.save(transaction)
-                .map(c -> transactionDTOMapper.convertToDto(c));
+
+        return accountService.findById(transaction.getAccountId()).flatMap(a -> {
+            if (a.makeTransaction(transaction)) {
+                return accountService.update(transaction.getAccountId(), a)
+                        .flatMap(ac -> transactionRepository.save(transaction));
+            } else {
+                return null;
+            }
+        }).map(c -> transactionDTOMapper.convertToDto(c));
     }
 
+    @Override
+    public Flux<Transaction> findAllByAccountId(Integer accountId) {
+        log.info("Listing all transactions by account id");
+        return transactionRepository.findAllByAccountId(accountId);
+    }
 }

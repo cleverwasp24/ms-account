@@ -19,4 +19,6 @@ public interface TransactionService {
 
     public Mono<TransactionDTO> createTransaction(TransactionDTO accountDTO);
 
+    Flux<Transaction> findAllByAccountId(Integer accountId);
+
 }

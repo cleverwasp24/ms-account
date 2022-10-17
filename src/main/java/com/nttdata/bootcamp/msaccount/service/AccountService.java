@@ -25,6 +25,9 @@ public interface AccountService {
 
     Mono<FixedTermDepositAccountDTO> createFixedTermDepositAccount(FixedTermDepositAccountDTO accountDTO);
 
+    Mono<Long> countClientAccounts(Integer clientId);
+
+    Flux<Account> findAllByClientId(Integer id);
 
 
 }

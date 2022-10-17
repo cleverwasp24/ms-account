@@ -24,6 +24,12 @@ public class TransactionController {
         return transactionService.findAll();
     }
 
+    @GetMapping(value = "/findAllTransactionsByClientId/{id}")
+    @ResponseBody
+    public Flux<Transaction> findAllTransactionsByClientId(@PathVariable Integer id) {
+        return transactionService.findAllByAccountId(id);
+    }
+
     @PostMapping(value = "/createTransaction")
     @ResponseStatus(HttpStatus.CREATED)
     public Mono<TransactionDTO> createTransaction(@RequestBody TransactionDTO transactionDTO) {
