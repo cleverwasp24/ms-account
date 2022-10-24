@@ -10,4 +10,6 @@ public interface AccountRepository extends ReactiveMongoRepository<Account, Inte
 
     Flux<Account> findAllByClientId(Integer id);
 
+    Flux<Account> findAllByClientIdAndAccountType(Integer clientId, Integer accountType);
+
 }

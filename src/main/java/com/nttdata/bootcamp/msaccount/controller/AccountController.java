@@ -1,14 +1,13 @@
 package com.nttdata.bootcamp.msaccount.controller;
 
-import com.nttdata.bootcamp.msaccount.dto.CurrentAccountDTO;
-import com.nttdata.bootcamp.msaccount.dto.FixedTermDepositAccountDTO;
-import com.nttdata.bootcamp.msaccount.dto.SavingsAccountDTO;
+import com.nttdata.bootcamp.msaccount.dto.*;
 import com.nttdata.bootcamp.msaccount.model.Account;
-import com.nttdata.bootcamp.msaccount.model.Transaction;
 import com.nttdata.bootcamp.msaccount.service.impl.AccountServiceImpl;
+import com.nttdata.bootcamp.msaccount.service.impl.TransactionServiceImpl;
 import lombok.extern.log4j.Log4j2;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
+import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 import reactor.core.publisher.Flux;
 import reactor.core.publisher.Mono;
@@ -20,6 +19,9 @@ public class AccountController {
 
     @Autowired
     AccountServiceImpl accountService;
+
+    @Autowired
+    TransactionServiceImpl transactionService;
 
     @GetMapping(value = "/findAllAccounts")
     @ResponseBody
@@ -35,41 +37,70 @@ public class AccountController {
 
     @PostMapping(value = "/createSavingsAccount")
     @ResponseStatus(HttpStatus.CREATED)
-    public Mono<SavingsAccountDTO> createSavingsAccount(@RequestBody SavingsAccountDTO savingsAccountDTO) {
+    public Mono<String> createSavingsAccount(@RequestBody SavingsAccountDTO savingsAccountDTO) {
         return accountService.createSavingsAccount(savingsAccountDTO);
     }
 
     @PostMapping(value = "/createCurrentAccount")
     @ResponseStatus(HttpStatus.CREATED)
-    public Mono<CurrentAccountDTO> createCurrentAccount(@RequestBody CurrentAccountDTO currentAccountDTO) {
+    public Mono<String> createCurrentAccount(@RequestBody CurrentAccountDTO currentAccountDTO) {
         return accountService.createCurrentAccount(currentAccountDTO);
     }
 
     @PostMapping(value = "/createFixedTermDepositAccount")
     @ResponseStatus(HttpStatus.CREATED)
-    public Mono<FixedTermDepositAccountDTO> createFixedTermDepositAccount(@RequestBody FixedTermDepositAccountDTO fixedTermDepositAccountDTO) {
+    public Mono<String> createFixedTermDepositAccount(@RequestBody FixedTermDepositAccountDTO fixedTermDepositAccountDTO) {
         return accountService.createFixedTermDepositAccount(fixedTermDepositAccountDTO);
+    }
+
+    @PostMapping(value = "/createVIPAccount")
+    @ResponseStatus(HttpStatus.CREATED)
+    public Mono<String> createVIPAccount(@RequestBody VIPAccountDTO vipAccountDTO) {
+        return accountService.createVIPAccount(vipAccountDTO);
+    }
+
+    @PostMapping(value = "/createPYMEAccount")
+    @ResponseStatus(HttpStatus.CREATED)
+    public Mono<String> createPYMEAccount(@RequestBody PYMEAccountDTO pymeAccountDTO) {
+        return accountService.createPYMEAccount(pymeAccountDTO);
     }
 
     @GetMapping(value = "/find/{id}")
     @ResponseBody
-    public Mono<Account> findAccountById(@PathVariable Integer id) {
+    public Mono<ResponseEntity<Account>> findAccountById(@PathVariable Integer id) {
         return accountService.findById(id)
-                .defaultIfEmpty(null);
+                .map(account -> ResponseEntity.ok().body(account))
+                .onErrorResume(e -> {
+                    log.info("Account not found " + id, e);
+                    return Mono.just(ResponseEntity.badRequest().build());
+                })
+                .defaultIfEmpty(ResponseEntity.notFound().build());
     }
 
     @PutMapping(value = "/update/{id}")
     @ResponseBody
-    public Mono<Account> updateAccount(@PathVariable Integer id, @RequestBody Account account) {
+    public Mono<ResponseEntity<Account>> updateAccount(@PathVariable Integer id, @RequestBody Account account) {
         return accountService.update(id, account)
-                .defaultIfEmpty(null);
+                .map(a -> new ResponseEntity<>(a, HttpStatus.ACCEPTED))
+                .defaultIfEmpty(new ResponseEntity<>(HttpStatus.NOT_FOUND));
     }
 
     @DeleteMapping(value = "/delete/{id}")
     @ResponseBody
     public Mono<Void> deleteByIdAccount(@PathVariable Integer id) {
-        return accountService.delete(id)
-                .defaultIfEmpty(null);
+        return accountService.delete(id);
+    }
+
+    @GetMapping(value = "/findAllByClientId/{id}")
+    @ResponseBody
+    public Flux<Account> findAllByClientId(@PathVariable Integer id) {
+        return accountService.findAllByClientId(id);
+    }
+
+    @GetMapping(value = "/getFeeInAPeriod/{id}")
+    @ResponseBody
+    public Mono<Double> getFeeInAPeriod(@PathVariable Integer id, @RequestBody PeriodDTO periodDTO) {
+        return transactionService.getFeeInAPeriod(id,periodDTO);
     }
 
 }

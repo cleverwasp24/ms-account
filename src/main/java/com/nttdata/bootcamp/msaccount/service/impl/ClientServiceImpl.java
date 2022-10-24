@@ -14,23 +14,19 @@ public class ClientServiceImpl implements ClientService {
     private final WebClient webClient;
 
     public ClientServiceImpl(WebClient.Builder webClientBuilder) {
-        this.webClient = webClientBuilder.baseUrl("http://localhost:8081").build();//microservicio cliente
+        //microservicio cliente
+        this.webClient = webClientBuilder.baseUrl("http://localhost:8081").build();
     }
 
     @Override
     public Mono<ClientDTO> findById(Integer id) {
-        ClientDTO client = new ClientDTO();
         Mono<ClientDTO> clientById = this.webClient.get()
-                .uri("/bootcamp/client/{id}", id)
+                .uri("/bootcamp/client/find/{id}", id)
                 .retrieve()
                 .bodyToMono(ClientDTO.class);
 
         log.info("Client obtained from service ms-client:" + clientById);
-        return clientById.flatMap(x -> {
-            client.setId(x.getId());
-            client.setClientType(x.getClientType());
-            return Mono.just(client);
-        });
+        return clientById;
     }
 
 }

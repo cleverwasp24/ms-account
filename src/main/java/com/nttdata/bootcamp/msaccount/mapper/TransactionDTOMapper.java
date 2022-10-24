@@ -1,7 +1,8 @@
 package com.nttdata.bootcamp.msaccount.mapper;
 
-import com.nttdata.bootcamp.msaccount.dto.TransactionDTO;
+import com.nttdata.bootcamp.msaccount.dto.*;
 import com.nttdata.bootcamp.msaccount.model.Transaction;
+import com.nttdata.bootcamp.msaccount.model.enums.TransactionTypeEnum;
 import org.modelmapper.ModelMapper;
 import org.springframework.beans.factory.annotation.Autowired;
 
@@ -12,12 +13,40 @@ public class TransactionDTOMapper {
     @Autowired
     private ModelMapper modelMapper = new ModelMapper();
 
-    public TransactionDTO convertToDto(Transaction transaction){
-        return modelMapper.map(transaction, TransactionDTO.class);
+    public Object convertToDto(Transaction transaction, TransactionTypeEnum type) {
+        return switch (type) {
+            case DEPOSIT, WITHDRAW -> modelMapper.map(transaction, TransactionDTO.class);
+            case TRANSFER_OWN, TRANSFER_THIRD -> modelMapper.map(transaction, TransferDTO.class);
+        };
     }
-    public Transaction convertToEntity(TransactionDTO transactionDTO) {
-        Transaction account = modelMapper.map(transactionDTO, Transaction.class);
-        account.setTransactionDate(LocalDateTime.now());
-        return account;
+
+    public Transaction convertToEntity(Object transactionDTO, TransactionTypeEnum type) {
+        Transaction transaction = modelMapper.map(transactionDTO, Transaction.class);
+        transaction.setTransactionDate(LocalDateTime.now());
+        transaction.setTransactionType(type.ordinal());
+        transaction.setFee(0.0);
+
+        switch (type) {
+            case DEPOSIT -> transaction.setDescription("ACCOUNT DEPOSIT +$ " + transaction.getAmount());
+            case WITHDRAW -> transaction.setDescription("ACCOUNT WITHDRAW -$ " + transaction.getAmount());
+            case TRANSFER_OWN -> transaction.setDescription("SEND OWN ACCOUNT TRANSFER -$ " + transaction.getAmount());
+            case TRANSFER_THIRD ->
+                    transaction.setDescription("SEND THIRD ACCOUNT TRANSFER -$ " + transaction.getAmount());
+        }
+
+        return transaction;
+    }
+
+    public Transaction generateDestinationAccountTransaction(Transaction transaction) {
+        Transaction destinationTransaction = modelMapper.map(transaction, Transaction.class);
+        destinationTransaction.setId(transaction.getId() + 1);
+        destinationTransaction.setAccountId(transaction.getDestinationAccountId());
+        switch (TransactionTypeEnum.valueOf(transaction.getTransactionType())) {
+            case TRANSFER_OWN ->
+                    destinationTransaction.setDescription("RECEIVE OWN ACCOUNT TRANSFER +$ " + transaction.getAmount());
+            case TRANSFER_THIRD ->
+                    destinationTransaction.setDescription("RECEIVE THIRD ACCOUNT TRANSFER +$ " + transaction.getAmount());
+        }
+        return destinationTransaction;
     }
 }

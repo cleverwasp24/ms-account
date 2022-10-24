@@ -6,7 +6,11 @@ import java.util.Map;
 public enum TransactionTypeEnum {
 
     DEPOSIT(0),
-    WITHDRAW(1);
+    WITHDRAW(1),
+
+    TRANSFER_OWN(2),
+
+    TRANSFER_THIRD(3);
 
     private int value;
     private static Map map = new HashMap();

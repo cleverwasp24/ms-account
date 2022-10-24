@@ -7,7 +7,9 @@ public enum AccountTypeEnum {
 
     SAVINGS(0),
     CURRENT(1),
-    FIXED_TERM_DEPOSIT(2);
+    FIXED_TERM_DEPOSIT(2),
+    VIP(3),
+    PYME(4);
 
     private int value;
     private static Map map = new HashMap();

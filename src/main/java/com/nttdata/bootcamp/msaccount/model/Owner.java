@@ -9,11 +9,11 @@ import org.springframework.data.mongodb.core.index.Indexed;
 public class Owner {
 
     @Id
-    @Indexed(unique = true)
     private Integer id;
     @NonNull
     private String docType;
     @NonNull
+    @Indexed(unique = true)
     private String docNumber;
     @NonNull
     private String firstName;

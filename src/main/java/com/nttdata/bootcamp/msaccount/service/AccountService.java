@@ -1,8 +1,6 @@
 package com.nttdata.bootcamp.msaccount.service;
 
-import com.nttdata.bootcamp.msaccount.dto.CurrentAccountDTO;
-import com.nttdata.bootcamp.msaccount.dto.FixedTermDepositAccountDTO;
-import com.nttdata.bootcamp.msaccount.dto.SavingsAccountDTO;
+import com.nttdata.bootcamp.msaccount.dto.*;
 import com.nttdata.bootcamp.msaccount.model.Account;
 import reactor.core.publisher.Flux;
 import reactor.core.publisher.Mono;
@@ -19,15 +17,20 @@ public interface AccountService {
 
     Mono<Void> delete(Integer id);
 
-    Mono<SavingsAccountDTO> createSavingsAccount(SavingsAccountDTO accountDTO);
+    Mono<String> createSavingsAccount(SavingsAccountDTO accountDTO);
 
-    Mono<CurrentAccountDTO> createCurrentAccount(CurrentAccountDTO accountDTO);
+    Mono<String> createCurrentAccount(CurrentAccountDTO accountDTO);
 
-    Mono<FixedTermDepositAccountDTO> createFixedTermDepositAccount(FixedTermDepositAccountDTO accountDTO);
+    Mono<String> createFixedTermDepositAccount(FixedTermDepositAccountDTO accountDTO);
 
-    Mono<Long> countClientAccounts(Integer clientId);
+    Mono<String> createVIPAccount(VIPAccountDTO accountDTO);
+
+    Mono<String> createPYMEAccount(PYMEAccountDTO accountDTO);
 
     Flux<Account> findAllByClientId(Integer id);
 
+    Flux<Account> findAllByClientIdAndAccountType(Integer id, Integer type);
+
+    Mono<String> checkFields(Account account);
 
 }

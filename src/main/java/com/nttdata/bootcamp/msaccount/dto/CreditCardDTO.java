@@ -3,10 +3,9 @@ package com.nttdata.bootcamp.msaccount.dto;
 import lombok.Data;
 
 @Data
-public class TransactionDTO {
+public class CreditCardDTO {
 
     private Integer id;
-    private Integer accountId;
-    private Double amount;
+    private Integer creditCardType;
 
 }

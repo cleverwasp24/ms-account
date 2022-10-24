@@ -1,11 +1,13 @@
 package com.nttdata.bootcamp.msaccount.controller;
 
 import com.nttdata.bootcamp.msaccount.dto.TransactionDTO;
+import com.nttdata.bootcamp.msaccount.dto.TransferDTO;
 import com.nttdata.bootcamp.msaccount.model.Transaction;
 import com.nttdata.bootcamp.msaccount.service.impl.TransactionServiceImpl;
 import lombok.extern.log4j.Log4j2;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
+import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 import reactor.core.publisher.Flux;
 import reactor.core.publisher.Mono;
@@ -24,36 +26,55 @@ public class TransactionController {
         return transactionService.findAll();
     }
 
-    @GetMapping(value = "/findAllTransactionsByClientId/{id}")
-    @ResponseBody
-    public Flux<Transaction> findAllTransactionsByClientId(@PathVariable Integer id) {
-        return transactionService.findAllByAccountId(id);
+
+    @PostMapping(value = "/deposit")
+    @ResponseStatus(HttpStatus.CREATED)
+    public Mono<String> deposit(@RequestBody TransactionDTO transactionDTO) {
+        return transactionService.deposit(transactionDTO);
     }
 
-    @PostMapping(value = "/createTransaction")
+    @PostMapping(value = "/withdraw")
     @ResponseStatus(HttpStatus.CREATED)
-    public Mono<TransactionDTO> createTransaction(@RequestBody TransactionDTO transactionDTO) {
-        return transactionService.createTransaction(transactionDTO);
+    public Mono<String> withdraw(@RequestBody TransactionDTO transactionDTO) {
+        return transactionService.withdraw(transactionDTO);
+    }
+
+    @PostMapping(value = "/transferOwnAccount")
+    @ResponseStatus(HttpStatus.CREATED)
+    public Mono<String> transferOwnAccount(@RequestBody TransferDTO transferDTO) {
+        return transactionService.transferOwnAccount(transferDTO);
+    }
+
+    @PostMapping(value = "/transferThirdAccount")
+    @ResponseStatus(HttpStatus.CREATED)
+    public Mono<String> transferThirdAccount(@RequestBody TransferDTO transferDTO) {
+        return transactionService.transferThirdAccount(transferDTO);
     }
 
     @GetMapping(value = "/find/{id}")
     @ResponseBody
-    public Mono<Transaction> findTransactionById(@PathVariable Integer id) {
+    public Mono<ResponseEntity<Transaction>> findTransactionById(@PathVariable Integer id) {
         return transactionService.findById(id)
-                .defaultIfEmpty(null);
+                .map(transaction -> ResponseEntity.ok().body(transaction))
+                .onErrorResume(e -> {
+                    log.info("Transaction not found " + id, e);
+                    return Mono.just(ResponseEntity.badRequest().build());
+                })
+                .defaultIfEmpty(ResponseEntity.notFound().build());
     }
 
     @PutMapping(value = "/update/{id}")
     @ResponseBody
-    public Mono<Transaction> updateTransaction(@PathVariable Integer id, @RequestBody Transaction transaction) {
+    public Mono<ResponseEntity<Transaction>> updateTransaction(@PathVariable Integer id, @RequestBody Transaction transaction) {
         return transactionService.update(id, transaction)
-                .defaultIfEmpty(null);
+                .map(t -> new ResponseEntity<>(t, HttpStatus.ACCEPTED))
+                .defaultIfEmpty(new ResponseEntity<>(HttpStatus.NOT_FOUND));
     }
 
     @DeleteMapping(value = "/delete/{id}")
     @ResponseBody
     public Mono<Void> deleteByIdTransaction(@PathVariable Integer id) {
-        return transactionService.delete(id)
-                .defaultIfEmpty(null);
+        return transactionService.delete(id);
     }
+
 }

@@ -7,12 +7,13 @@ import lombok.Data;
 import java.util.List;
 
 @Data
-public class CurrentAccountDTO {
+public class PYMEAccountDTO {
 
     private Integer id;
     private Integer clientId;
     private String accountNumber;
     private Double balance;
+    private Double maintenanceFee;
     private List<Owner> owners;
     private List<AuthorizedSigner> signers;
 
