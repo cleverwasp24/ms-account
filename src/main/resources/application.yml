@@ -16,10 +16,7 @@ spring:
     name: ms-account
 logging:
   level:
-    com:
-      nttdata:
-        bootcamp:
-          msaccount: info
+    '[com.nttdata.bootcamp.msaccount]': info
 server:
   port: '8082'
 eureka:
