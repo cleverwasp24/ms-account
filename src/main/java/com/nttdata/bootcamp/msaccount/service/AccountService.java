@@ -11,11 +11,11 @@ public interface AccountService {
 
     Mono<Account> create(Account account);
 
-    Mono<Account> findById(Integer id);
+    Mono<Account> findById(Long id);
 
-    Mono<Account> update(Integer id, Account account);
+    Mono<Account> update(Long id, Account account);
 
-    Mono<Void> delete(Integer id);
+    Mono<Void> delete(Long id);
 
     Mono<String> createSavingsAccount(SavingsAccountDTO accountDTO);
 
@@ -27,9 +27,9 @@ public interface AccountService {
 
     Mono<String> createPYMEAccount(PYMEAccountDTO accountDTO);
 
-    Flux<Account> findAllByClientId(Integer id);
+    Flux<Account> findAllByClientId(Long id);
 
-    Flux<Account> findAllByClientIdAndAccountType(Integer id, Integer type);
+    Flux<Account> findAllByClientIdAndAccountType(Long id, Integer type);
 
     Mono<String> checkFields(Account account);
 

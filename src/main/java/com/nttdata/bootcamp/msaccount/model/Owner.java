@@ -9,7 +9,7 @@ import org.springframework.data.mongodb.core.index.Indexed;
 public class Owner {
 
     @Id
-    private Integer id;
+    private Long id;
     @NonNull
     private String docType;
     @NonNull

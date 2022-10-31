@@ -15,7 +15,7 @@ public class TransactionDTOMapper {
 
     public Object convertToDto(Transaction transaction, TransactionTypeEnum type) {
         return switch (type) {
-            case DEPOSIT, WITHDRAW -> modelMapper.map(transaction, TransactionDTO.class);
+            case DEPOSIT, WITHDRAW, CARD_DEPOSIT, CARD_PURCHASE -> modelMapper.map(transaction, TransactionDTO.class);
             case TRANSFER_OWN, TRANSFER_THIRD -> modelMapper.map(transaction, TransferDTO.class);
         };
     }
@@ -32,6 +32,8 @@ public class TransactionDTOMapper {
             case TRANSFER_OWN -> transaction.setDescription("SEND OWN ACCOUNT TRANSFER -$ " + transaction.getAmount());
             case TRANSFER_THIRD ->
                     transaction.setDescription("SEND THIRD ACCOUNT TRANSFER -$ " + transaction.getAmount());
+            case CARD_DEPOSIT -> transaction.setDescription("DEBIT CARD DEPOSIT +$ " + transaction.getAmount());
+            case CARD_PURCHASE -> transaction.setDescription("DEBIT CARD PURCHASE -$ " + transaction.getAmount());
         }
 
         return transaction;

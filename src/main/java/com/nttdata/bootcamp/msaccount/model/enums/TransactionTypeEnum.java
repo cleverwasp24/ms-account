@@ -10,7 +10,11 @@ public enum TransactionTypeEnum {
 
     TRANSFER_OWN(2),
 
-    TRANSFER_THIRD(3);
+    TRANSFER_THIRD(3),
+
+    CARD_DEPOSIT(4),
+
+    CARD_PURCHASE(5);
 
     private int value;
     private static Map map = new HashMap();

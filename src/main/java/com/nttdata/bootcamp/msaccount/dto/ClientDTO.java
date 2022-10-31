@@ -5,7 +5,7 @@ import lombok.Data;
 @Data
 public class ClientDTO {
 
-    private Integer id;
+    private Long id;
     private Integer clientType;
 
 }

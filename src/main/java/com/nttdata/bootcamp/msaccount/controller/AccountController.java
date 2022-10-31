@@ -31,7 +31,7 @@ public class AccountController {
 
     @GetMapping(value = "/findAllAccountsByClientId/{id}")
     @ResponseBody
-    public Flux<Account> findAllAccountsByClientId(@PathVariable Integer id) {
+    public Flux<Account> findAllAccountsByClientId(@PathVariable Long id) {
         return accountService.findAllByClientId(id);
     }
 
@@ -67,7 +67,7 @@ public class AccountController {
 
     @GetMapping(value = "/find/{id}")
     @ResponseBody
-    public Mono<ResponseEntity<Account>> findAccountById(@PathVariable Integer id) {
+    public Mono<ResponseEntity<Account>> findAccountById(@PathVariable Long id) {
         return accountService.findById(id)
                 .map(account -> ResponseEntity.ok().body(account))
                 .onErrorResume(e -> {
@@ -79,7 +79,7 @@ public class AccountController {
 
     @PutMapping(value = "/update/{id}")
     @ResponseBody
-    public Mono<ResponseEntity<Account>> updateAccount(@PathVariable Integer id, @RequestBody Account account) {
+    public Mono<ResponseEntity<Account>> updateAccount(@PathVariable Long id, @RequestBody Account account) {
         return accountService.update(id, account)
                 .map(a -> new ResponseEntity<>(a, HttpStatus.ACCEPTED))
                 .defaultIfEmpty(new ResponseEntity<>(HttpStatus.NOT_FOUND));
@@ -87,20 +87,22 @@ public class AccountController {
 
     @DeleteMapping(value = "/delete/{id}")
     @ResponseBody
-    public Mono<Void> deleteByIdAccount(@PathVariable Integer id) {
+    public Mono<Void> deleteByIdAccount(@PathVariable Long id) {
         return accountService.delete(id);
     }
 
     @GetMapping(value = "/findAllByClientId/{id}")
     @ResponseBody
-    public Flux<Account> findAllByClientId(@PathVariable Integer id) {
+    public Flux<Account> findAllByClientId(@PathVariable Long id) {
         return accountService.findAllByClientId(id);
     }
 
     @GetMapping(value = "/getFeeInAPeriod/{id}")
     @ResponseBody
-    public Mono<Double> getFeeInAPeriod(@PathVariable Integer id, @RequestBody PeriodDTO periodDTO) {
-        return transactionService.getFeeInAPeriod(id,periodDTO);
+    public Mono<Double> getFeeInAPeriod(@PathVariable Long id, @RequestBody PeriodDTO periodDTO) {
+        return accountService.findById(id)
+                .flatMap(account -> transactionService.getFeeInAPeriod(account.getId(), periodDTO))
+                .switchIfEmpty(Mono.error(new Exception("Account not found")));
     }
 
 }

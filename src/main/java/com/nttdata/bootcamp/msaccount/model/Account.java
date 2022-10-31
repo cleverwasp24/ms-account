@@ -7,6 +7,7 @@ import lombok.Data;
 import lombok.NoArgsConstructor;
 import lombok.extern.log4j.Log4j2;
 import org.springframework.data.annotation.Id;
+import org.springframework.data.annotation.Transient;
 import org.springframework.data.mongodb.core.index.Indexed;
 import org.springframework.data.mongodb.core.mapping.Document;
 
@@ -20,10 +21,13 @@ import java.util.List;
 @Log4j2
 public class Account {
 
+    @Transient
+    public static final String SEQUENCE_NAME = "account_sequence";
+
     @Id
-    private Integer id;
+    private Long id;
     @NonNull
-    private Integer clientId;
+    private Long clientId;
     @NonNull
     private Integer accountType;
     @NonNull

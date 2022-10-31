@@ -18,7 +18,7 @@ public class CreditCardServiceImpl implements CreditCardService {
         this.webClient = webClientBuilder.baseUrl("http://localhost:8083").build();
     }
 
-    public Flux<CreditCardDTO> findAllById(Integer id){
+    public Flux<CreditCardDTO> findAllById(Long id){
         Flux<CreditCardDTO> findAllById =  this.webClient.get()
                 .uri("/bootcamp/creditcard/findAllByClientId/{id}", id)
                 .retrieve()

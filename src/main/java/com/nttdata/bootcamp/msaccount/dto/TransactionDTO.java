@@ -5,8 +5,7 @@ import lombok.Data;
 @Data
 public class TransactionDTO {
 
-    private Integer id;
-    private Integer accountId;
+    private Long accountId;
     private Double amount;
 
 }

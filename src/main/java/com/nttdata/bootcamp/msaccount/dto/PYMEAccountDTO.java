@@ -9,8 +9,7 @@ import java.util.List;
 @Data
 public class PYMEAccountDTO {
 
-    private Integer id;
-    private Integer clientId;
+    private Long clientId;
     private String accountNumber;
     private Double balance;
     private Double maintenanceFee;

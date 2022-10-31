@@ -5,7 +5,7 @@ import lombok.Data;
 @Data
 public class CreditCardDTO {
 
-    private Integer id;
-    private Integer creditCardType;
+    private Long id;
+    private Integer cardType;
 
 }

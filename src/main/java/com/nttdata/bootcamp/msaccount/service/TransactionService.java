@@ -15,11 +15,11 @@ public interface TransactionService {
 
     Mono<Transaction> create(Transaction transaction);
 
-    Mono<Transaction> findById(Integer id);
+    Mono<Transaction> findById(Long id);
 
-    Mono<Transaction> update(Integer id, Transaction transaction);
+    Mono<Transaction> update(Long id, Transaction transaction);
 
-    Mono<Void> delete(Integer id);
+    Mono<Void> delete(Long id);
 
     Mono<String> withdraw(TransactionDTO transactionDTO);
 
@@ -29,14 +29,18 @@ public interface TransactionService {
 
     Mono<String> transferThirdAccount(TransferDTO transferDTO);
 
-    Flux<Transaction> findAllByAccountId(Integer accountId);
+    Mono<String> cardPurchase(TransactionDTO transactionDTO);
 
-     Mono<Long> countTransactionsAccountMonth(Integer accountId, LocalDateTime date);
+    Mono<String> cardDeposit(TransactionDTO transactionDTO);
 
-    Flux<Transaction> findTransactionsAccountMonth(Integer accountId, LocalDateTime date);
+    Flux<Transaction> findAllByAccountId(Long accountId);
+
+     Mono<Long> countTransactionsAccountMonth(Long accountId, LocalDateTime date);
+
+    Flux<Transaction> findTransactionsAccountMonth(Long accountId, LocalDateTime date);
 
     Mono<String> checkFields(Transaction transaction);
 
-    Mono<Double> getFeeInAPeriod(Integer accountId, PeriodDTO periodDTO);
+    Mono<Double> getFeeInAPeriod(Long accountId, PeriodDTO periodDTO);
 
 }

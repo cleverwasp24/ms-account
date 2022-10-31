@@ -5,6 +5,6 @@ import reactor.core.publisher.Flux;
 
 public interface CreditCardService {
 
-    Flux<CreditCardDTO> findAllById(Integer id);
+    Flux<CreditCardDTO> findAllById(Long id);
 
 }

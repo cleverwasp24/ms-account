@@ -51,9 +51,21 @@ public class TransactionController {
         return transactionService.transferThirdAccount(transferDTO);
     }
 
+    @PostMapping(value = "/cardDeposit")
+    @ResponseStatus(HttpStatus.CREATED)
+    public Mono<String> cardDeposit(@RequestBody TransactionDTO transactionDTO) {
+        return transactionService.cardDeposit(transactionDTO);
+    }
+
+    @PostMapping(value = "/cardPurchase")
+    @ResponseStatus(HttpStatus.CREATED)
+    public Mono<String> cardPurchase(@RequestBody TransactionDTO transactionDTO) {
+        return transactionService.cardPurchase(transactionDTO);
+    }
+
     @GetMapping(value = "/find/{id}")
     @ResponseBody
-    public Mono<ResponseEntity<Transaction>> findTransactionById(@PathVariable Integer id) {
+    public Mono<ResponseEntity<Transaction>> findTransactionById(@PathVariable Long id) {
         return transactionService.findById(id)
                 .map(transaction -> ResponseEntity.ok().body(transaction))
                 .onErrorResume(e -> {
@@ -65,7 +77,7 @@ public class TransactionController {
 
     @PutMapping(value = "/update/{id}")
     @ResponseBody
-    public Mono<ResponseEntity<Transaction>> updateTransaction(@PathVariable Integer id, @RequestBody Transaction transaction) {
+    public Mono<ResponseEntity<Transaction>> updateTransaction(@PathVariable Long id, @RequestBody Transaction transaction) {
         return transactionService.update(id, transaction)
                 .map(t -> new ResponseEntity<>(t, HttpStatus.ACCEPTED))
                 .defaultIfEmpty(new ResponseEntity<>(HttpStatus.NOT_FOUND));
@@ -73,7 +85,7 @@ public class TransactionController {
 
     @DeleteMapping(value = "/delete/{id}")
     @ResponseBody
-    public Mono<Void> deleteByIdTransaction(@PathVariable Integer id) {
+    public Mono<Void> deleteByIdTransaction(@PathVariable Long id) {
         return transactionService.delete(id);
     }
 

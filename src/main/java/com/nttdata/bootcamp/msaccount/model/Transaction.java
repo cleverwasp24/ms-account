@@ -8,7 +8,7 @@ import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 import org.springframework.data.annotation.Id;
-import org.springframework.data.mongodb.core.index.Indexed;
+import org.springframework.data.annotation.Transient;
 import org.springframework.data.mongodb.core.mapping.Document;
 
 import java.time.LocalDateTime;
@@ -19,12 +19,15 @@ import java.time.LocalDateTime;
 @Data
 public class Transaction {
 
+    @Transient
+    public static final String SEQUENCE_NAME = "transaction_sequence";
+
     @Id
-    private Integer id;
+    private Long id;
     @NonNull
-    private Integer accountId;
+    private Long accountId;
     @Nullable
-    private Integer destinationAccountId;
+    private Long destinationAccountId;
     @NonNull
     private Integer transactionType;
     @NonNull
@@ -43,6 +46,8 @@ public class Transaction {
             case SAVINGS -> this.setFee(Constants.SAVINGS_TRANSACTION_FEE);
             case CURRENT -> this.setFee(Constants.CURRENT_TRANSACTION_FEE);
             case FIXED_TERM_DEPOSIT -> this.setFee(Constants.FIXED_TERM_DEPOSIT_TRANSACTION_FEE);
+            case VIP -> this.setFee(Constants.VIP_TRANSACTION_FEE);
+            case PYME -> this.setFee(Constants.PYME_TRANSACTION_FEE);
         }
     }
 

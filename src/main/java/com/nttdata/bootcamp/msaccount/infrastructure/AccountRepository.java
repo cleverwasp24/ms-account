@@ -6,10 +6,10 @@ import org.springframework.stereotype.Repository;
 import reactor.core.publisher.Flux;
 
 @Repository
-public interface AccountRepository extends ReactiveMongoRepository<Account, Integer> {
+public interface AccountRepository extends ReactiveMongoRepository<Account, Long> {
 
-    Flux<Account> findAllByClientId(Integer id);
+    Flux<Account> findAllByClientId(Long id);
 
-    Flux<Account> findAllByClientIdAndAccountType(Integer clientId, Integer accountType);
+    Flux<Account> findAllByClientIdAndAccountType(Long clientId, Integer accountType);
 
 }

@@ -1,5 +1,6 @@
 package com.nttdata.bootcamp.msaccount.service.impl;
 
+import ch.qos.logback.core.net.server.Client;
 import com.nttdata.bootcamp.msaccount.dto.ClientDTO;
 import com.nttdata.bootcamp.msaccount.service.ClientService;
 import lombok.extern.log4j.Log4j2;
@@ -19,7 +20,7 @@ public class ClientServiceImpl implements ClientService {
     }
 
     @Override
-    public Mono<ClientDTO> findById(Integer id) {
+    public Mono<ClientDTO> findById(Long id) {
         Mono<ClientDTO> clientById = this.webClient.get()
                 .uri("/bootcamp/client/find/{id}", id)
                 .retrieve()
