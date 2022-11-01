@@ -41,7 +41,6 @@ public class TransactionDTOMapper {
 
     public Transaction generateDestinationAccountTransaction(Transaction transaction) {
         Transaction destinationTransaction = modelMapper.map(transaction, Transaction.class);
-        destinationTransaction.setId(transaction.getId() + 1);
         destinationTransaction.setAccountId(transaction.getDestinationAccountId());
         switch (TransactionTypeEnum.valueOf(transaction.getTransactionType())) {
             case TRANSFER_OWN ->

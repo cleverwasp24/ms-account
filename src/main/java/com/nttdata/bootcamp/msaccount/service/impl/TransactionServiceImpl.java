@@ -8,6 +8,7 @@ import com.nttdata.bootcamp.msaccount.mapper.TransactionDTOMapper;
 import com.nttdata.bootcamp.msaccount.model.Transaction;
 import com.nttdata.bootcamp.msaccount.model.enums.AccountTypeEnum;
 import com.nttdata.bootcamp.msaccount.model.enums.TransactionTypeEnum;
+import com.nttdata.bootcamp.msaccount.service.DatabaseSequenceService;
 import com.nttdata.bootcamp.msaccount.service.TransactionService;
 import lombok.extern.log4j.Log4j2;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -16,6 +17,7 @@ import reactor.core.publisher.Flux;
 import reactor.core.publisher.Mono;
 
 import java.time.LocalDateTime;
+import java.time.LocalTime;
 import java.time.temporal.TemporalAdjusters;
 
 @Log4j2
@@ -27,6 +29,9 @@ public class TransactionServiceImpl implements TransactionService {
 
     @Autowired
     private AccountServiceImpl accountService;
+
+    @Autowired
+    private DatabaseSequenceService databaseSequenceService;
 
     private TransactionDTOMapper transactionDTOMapper = new TransactionDTOMapper();
 
@@ -79,7 +84,10 @@ public class TransactionServiceImpl implements TransactionService {
                         }
                         transaction.setNewBalance(a.getBalance());
                         return accountService.update(a.getId(), a)
-                                .flatMap(ac -> transactionRepository.save(transaction))
+                                .flatMap(ac -> databaseSequenceService.generateSequence(Transaction.SEQUENCE_NAME).flatMap(id -> {
+                                    transaction.setId(id);
+                                    return transactionRepository.save(transaction);
+                                }))
                                 .flatMap(t -> Mono.just("Deposit done, new balance: " + a.getBalance()));
                     });
                 }).switchIfEmpty(Mono.error(new IllegalArgumentException("Account not found"))));
@@ -102,7 +110,10 @@ public class TransactionServiceImpl implements TransactionService {
                         }
                         transaction.setNewBalance(a.getBalance());
                         return accountService.update(a.getId(), a)
-                                .flatMap(ac -> transactionRepository.save(transaction))
+                                .flatMap(ac -> databaseSequenceService.generateSequence(Transaction.SEQUENCE_NAME).flatMap(id -> {
+                                    transaction.setId(id);
+                                    return transactionRepository.save(transaction);
+                                }))
                                 .flatMap(t -> Mono.just("Withdraw done, new balance: " + a.getBalance()));
                     });
                 }).switchIfEmpty(Mono.error(new IllegalArgumentException("Account not found"))));
@@ -124,9 +135,15 @@ public class TransactionServiceImpl implements TransactionService {
                         Transaction destinationAccountTransaction = transactionDTOMapper.generateDestinationAccountTransaction(transaction);
                         destinationAccountTransaction.setNewBalance(destinationAccount.getBalance());
                         return accountService.update(originAccount.getId(), originAccount)
-                                .flatMap(oa -> transactionRepository.save(transaction))
+                                .flatMap(oa -> databaseSequenceService.generateSequence(Transaction.SEQUENCE_NAME).flatMap(id -> {
+                                    transaction.setId(id);
+                                    return transactionRepository.save(transaction);
+                                }))
                                 .flatMap(ot -> accountService.update(destinationAccount.getId(), destinationAccount))
-                                .flatMap(da -> transactionRepository.save(destinationAccountTransaction))
+                                .flatMap(da -> databaseSequenceService.generateSequence(Transaction.SEQUENCE_NAME).flatMap(id -> {
+                                    destinationAccountTransaction.setId(id);
+                                    return transactionRepository.save(destinationAccountTransaction);
+                                }))
                                 .flatMap(dt -> Mono.just("Transfer to own account done, new balance: " + originAccount.getBalance()));
                     }).switchIfEmpty(Mono.error(new IllegalArgumentException("Destination account not found")));
                 }).switchIfEmpty(Mono.error(new IllegalArgumentException("Origin Account not found"))));
@@ -148,9 +165,15 @@ public class TransactionServiceImpl implements TransactionService {
                         Transaction destinationAccountTransaction = transactionDTOMapper.generateDestinationAccountTransaction(transaction);
                         destinationAccountTransaction.setNewBalance(destinationAccount.getBalance());
                         return accountService.update(originAccount.getId(), originAccount)
-                                .flatMap(oa -> transactionRepository.save(transaction))
+                                .flatMap(oa -> databaseSequenceService.generateSequence(Transaction.SEQUENCE_NAME).flatMap(id -> {
+                                    transaction.setId(id);
+                                    return transactionRepository.save(transaction);
+                                }))
                                 .flatMap(ot -> accountService.update(destinationAccount.getId(), destinationAccount))
-                                .flatMap(da -> transactionRepository.save(destinationAccountTransaction))
+                                .flatMap(da -> databaseSequenceService.generateSequence(Transaction.SEQUENCE_NAME).flatMap(id -> {
+                                    destinationAccountTransaction.setId(id);
+                                    return transactionRepository.save(destinationAccountTransaction);
+                                }))
                                 .flatMap(dt -> Mono.just("Transfer to third account done, new balance: " + originAccount.getBalance()));
                     }).switchIfEmpty(Mono.error(new IllegalArgumentException("Destination account not found")));
                 }).switchIfEmpty(Mono.error(new IllegalArgumentException("Origin Account not found"))));
@@ -159,13 +182,16 @@ public class TransactionServiceImpl implements TransactionService {
     @Override
     public Mono<String> cardDeposit(TransactionDTO transactionDTO) {
         log.info("Making a debit card deposit: " + transactionDTO.toString());
-        Transaction transaction = transactionDTOMapper.convertToEntity(transactionDTO, TransactionTypeEnum.DEPOSIT);
+        Transaction transaction = transactionDTOMapper.convertToEntity(transactionDTO, TransactionTypeEnum.CARD_DEPOSIT);
         return checkFields(transaction)
                 .switchIfEmpty(accountService.findById(transaction.getAccountId()).flatMap(a -> {
                     a.setBalance(a.getBalance() + transaction.getAmount());
                     transaction.setNewBalance(a.getBalance());
                     return accountService.update(a.getId(), a)
-                            .flatMap(ac -> transactionRepository.save(transaction))
+                            .flatMap(ac -> databaseSequenceService.generateSequence(Transaction.SEQUENCE_NAME).flatMap(id -> {
+                                transaction.setId(id);
+                                return transactionRepository.save(transaction);
+                            }))
                             .flatMap(t -> Mono.just("Debit Card Deposit done, new balance: " + a.getBalance()));
                 }).switchIfEmpty(Mono.error(new IllegalArgumentException("Account not found"))));
     }
@@ -173,7 +199,7 @@ public class TransactionServiceImpl implements TransactionService {
     @Override
     public Mono<String> cardPurchase(TransactionDTO transactionDTO) {
         log.info("Making a debit card purchase: " + transactionDTO.toString());
-        Transaction transaction = transactionDTOMapper.convertToEntity(transactionDTO, TransactionTypeEnum.WITHDRAW);
+        Transaction transaction = transactionDTOMapper.convertToEntity(transactionDTO, TransactionTypeEnum.CARD_PURCHASE);
         return checkFields(transaction)
                 .switchIfEmpty(accountService.findById(transaction.getAccountId()).flatMap(a -> {
                     a.setBalance(a.getBalance() - transaction.getAmount());
@@ -182,7 +208,10 @@ public class TransactionServiceImpl implements TransactionService {
                     }
                     transaction.setNewBalance(a.getBalance());
                     return accountService.update(a.getId(), a)
-                            .flatMap(ac -> transactionRepository.save(transaction))
+                            .flatMap(ac -> databaseSequenceService.generateSequence(Transaction.SEQUENCE_NAME).flatMap(id -> {
+                                transaction.setId(id);
+                                return transactionRepository.save(transaction);
+                            }))
                             .flatMap(t -> Mono.just("Debit card purchase done, new balance: " + a.getBalance()));
                 }).switchIfEmpty(Mono.error(new IllegalArgumentException("Account not found"))));
     }
@@ -207,7 +236,8 @@ public class TransactionServiceImpl implements TransactionService {
 
     @Override
     public Flux<Transaction> findTransactionsAccountMonth(Long accountId, LocalDateTime date) {
-        return transactionRepository.findAllByAccountIdAndTransactionDateBetween(accountId, date.withDayOfMonth(1), date.with(TemporalAdjusters.lastDayOfMonth()));
+        return transactionRepository.findAllByAccountIdAndTransactionDateBetween(accountId,
+                date.withDayOfMonth(1).with(LocalTime.MIN), date.with(TemporalAdjusters.lastDayOfMonth()).with(LocalTime.MAX));
     }
 
     //@Override
@@ -220,8 +250,7 @@ public class TransactionServiceImpl implements TransactionService {
         if (transaction.getAmount() == null || transaction.getAmount() <= 0) {
             return Mono.error(new IllegalArgumentException("Account transaction amount must be greater than 0"));
         }
-        return transactionRepository.findById(transaction.getId())
-                .flatMap(cc -> Mono.error(new IllegalArgumentException("Account transaction id already exists")));
+        return Mono.empty();
     }
 
 }

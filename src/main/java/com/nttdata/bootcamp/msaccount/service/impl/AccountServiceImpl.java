@@ -206,10 +206,7 @@ public class AccountServiceImpl implements AccountService {
         if (account.getBalance() == null || account.getBalance() < 0) {
             return Mono.error(new IllegalArgumentException("New account balance must be equal or greater than 0"));
         }
-        if (account.getId() == null) {
-            return Mono.empty();
-        }
-        return accountRepository.findById(account.getId()).flatMap(cc -> Mono.error(new IllegalArgumentException("Account id already exists"+cc.getId())));
+        return Mono.empty();
     }
 
 }
