@@ -4,16 +4,25 @@ import com.nttdata.bootcamp.msaccount.dto.*;
 import com.nttdata.bootcamp.msaccount.infrastructure.AccountRepository;
 import com.nttdata.bootcamp.msaccount.mapper.AccountDTOMapper;
 import com.nttdata.bootcamp.msaccount.model.Account;
+import com.nttdata.bootcamp.msaccount.model.Transaction;
 import com.nttdata.bootcamp.msaccount.model.enums.AccountTypeEnum;
 import com.nttdata.bootcamp.msaccount.model.enums.ClientTypeEnum;
 import com.nttdata.bootcamp.msaccount.service.AccountService;
 import com.nttdata.bootcamp.msaccount.service.CreditCardService;
 import com.nttdata.bootcamp.msaccount.service.DatabaseSequenceService;
+import com.nttdata.bootcamp.msaccount.service.TransactionService;
 import lombok.extern.log4j.Log4j2;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import reactor.core.publisher.Flux;
 import reactor.core.publisher.Mono;
+
+import java.time.LocalDate;
+import java.time.temporal.ChronoUnit;
+import java.util.ArrayList;
+import java.util.Comparator;
+import java.util.HashMap;
+import java.util.stream.Collectors;
 
 @Log4j2
 @Service
@@ -70,22 +79,29 @@ public class AccountServiceImpl implements AccountService {
     public Mono<String> createSavingsAccount(SavingsAccountDTO accountDTO) {
         log.info("Creating savings account: " + accountDTO.toString());
         Account account = accountDTOMapper.convertToEntity(accountDTO, AccountTypeEnum.SAVINGS);
-        return checkFields(account).switchIfEmpty(clientService.findById(account.getClientId()).flatMap(c -> {
-            switch (ClientTypeEnum.valueOf(c.getClientType())) {
-                case PERSONAL:
-                    return findAllByClientIdAndAccountType(account.getClientId(), AccountTypeEnum.SAVINGS.ordinal()).count().flatMap(l -> (l < 1)
-                                    ? databaseSequenceService.generateSequence(Account.SEQUENCE_NAME).flatMap(sequence -> {
-                                account.setId(sequence);
-                                return accountRepository.save(account)
-                                        .flatMap(a -> Mono.just("Savings Account created! " + accountDTOMapper.convertToDto(a, AccountTypeEnum.SAVINGS)));
-                            }) : Mono.error(new IllegalArgumentException("Personal clients can have only one savings account"))
-                    );
-                case BUSINESS:
-                    return Mono.error(new IllegalArgumentException("Only personal clients can create savings accounts"));
-                default:
-                    return Mono.error(new IllegalArgumentException("Invalid client type"));
-            }
-        }).switchIfEmpty(Mono.error(new IllegalArgumentException("Client not found"))));
+        //Validar los datos de la cuenta
+        return checkFields(account)
+                //Validar que el cliente exista
+                .switchIfEmpty(clientService.findById(account.getClientId()).flatMap(c -> {
+                    switch (ClientTypeEnum.valueOf(c.getClientType())) {
+                        case PERSONAL:
+                            //Si es cliente personal, validar que no tenga cuenta de ahorros
+                            return findAllByClientIdAndAccountType(account.getClientId(), AccountTypeEnum.SAVINGS.ordinal()).count().flatMap(l -> (l < 1)
+                                            //Si no tiene cuenta de ahorros, generar id de cuenta y crear cuenta
+                                            ? databaseSequenceService.generateSequence(Account.SEQUENCE_NAME).flatMap(sequence -> {
+                                                account.setId(sequence);
+                                                return accountRepository.save(account);
+                                            })
+                                            .flatMap(a -> Mono.just("Savings Account created! " + accountDTOMapper.convertToDto(a, AccountTypeEnum.SAVINGS)))
+                                            : Mono.error(new IllegalArgumentException("Personal clients can have only one savings account"))
+                            );
+                        case BUSINESS:
+                            //Si es cliente empresarial, no puede tener cuenta de ahorros
+                            return Mono.error(new IllegalArgumentException("Only personal clients can create savings accounts"));
+                        default:
+                            return Mono.error(new IllegalArgumentException("Invalid client type"));
+                    }
+                }).switchIfEmpty(Mono.error(new IllegalArgumentException("Client not found"))));
     }
 
     @Override
@@ -97,10 +113,11 @@ public class AccountServiceImpl implements AccountService {
                 case PERSONAL:
                     return findAllByClientIdAndAccountType(account.getClientId(), AccountTypeEnum.CURRENT.ordinal()).count().flatMap(l -> (l < 1)
                                     ? databaseSequenceService.generateSequence(Account.SEQUENCE_NAME).flatMap(sequence -> {
-                                account.setId(sequence);
-                                return accountRepository.save(account)
-                                        .flatMap(a -> Mono.just("Current Account created! " + accountDTOMapper.convertToDto(a, AccountTypeEnum.CURRENT)));
-                            }) : Mono.error(new IllegalArgumentException("Personal clients can have only one current account"))
+                                        account.setId(sequence);
+                                        return accountRepository.save(account);
+                                    })
+                                    .flatMap(a -> Mono.just("Current Account created! " + accountDTOMapper.convertToDto(a, AccountTypeEnum.CURRENT)))
+                                    : Mono.error(new IllegalArgumentException("Personal clients can have only one current account"))
                     );
                 case BUSINESS:
                     if (account.getOwners() != null && !account.getOwners().isEmpty()) {

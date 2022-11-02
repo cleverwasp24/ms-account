@@ -1,5 +1,6 @@
 package com.nttdata.bootcamp.msaccount.service;
 
+import com.nttdata.bootcamp.msaccount.dto.AccountReportDTO;
 import com.nttdata.bootcamp.msaccount.dto.PeriodDTO;
 import com.nttdata.bootcamp.msaccount.dto.TransactionDTO;
 import com.nttdata.bootcamp.msaccount.dto.TransferDTO;
@@ -35,12 +36,21 @@ public interface TransactionService {
 
     Flux<Transaction> findAllByAccountId(Long accountId);
 
-     Mono<Long> countTransactionsAccountMonth(Long accountId, LocalDateTime date);
+    Flux<Transaction> findAllByAccountIdDesc(Long accountId);
+
+    Mono<Long> countTransactionsAccountMonth(Long accountId, LocalDateTime date);
 
     Flux<Transaction> findTransactionsAccountMonth(Long accountId, LocalDateTime date);
+
+    Flux<Transaction> findTransactionsAccountPeriod(Long accountId, LocalDateTime start, LocalDateTime end);
 
     Mono<String> checkFields(Transaction transaction);
 
     Mono<Double> getFeeInAPeriod(Long accountId, PeriodDTO periodDTO);
 
+    Mono<Transaction> findLastTransactionBefore(Long id, LocalDateTime date);
+
+    Mono<AccountReportDTO> generateAccountReportCurrentMonth(Long id);
+
+    Mono<AccountReportDTO> generateAccountReport(Long id, PeriodDTO periodDTO);
 }

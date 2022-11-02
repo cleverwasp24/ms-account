@@ -35,6 +35,8 @@ public class Account {
     private String accountNumber;
     @NonNull
     private Double balance;
+    @NonNull
+    private Double openingBalance;
     @Nullable
     private Integer maxFreeTransactions;
     @Nullable

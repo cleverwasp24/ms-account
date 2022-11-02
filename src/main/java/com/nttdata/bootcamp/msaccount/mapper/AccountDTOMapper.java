@@ -26,6 +26,7 @@ public class AccountDTOMapper {
     public Account convertToEntity(Object accountDTO, AccountTypeEnum type) {
         Account account = modelMapper.map(accountDTO, Account.class);
         account.setAccountType(type.ordinal());
+        account.setOpeningBalance(account.getBalance());
         account.setOpeningDate(LocalDateTime.now());
         account.setMaintenanceFee(0.00);
         switch (type) {

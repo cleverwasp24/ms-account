@@ -3,13 +3,11 @@ package com.nttdata.bootcamp.msaccount.dto;
 import lombok.AllArgsConstructor;
 import lombok.Data;
 
-import java.time.LocalDateTime;
+import java.time.LocalDate;
 
 @Data
 @AllArgsConstructor
-public class PeriodDTO {
-
-    private LocalDateTime start;
-    private LocalDateTime end;
-
+public class DailyBalanceDTO {
+    private LocalDate date;
+    private Double balance;
 }

@@ -2,6 +2,7 @@ package com.nttdata.bootcamp.msaccount.controller;
 
 import com.nttdata.bootcamp.msaccount.dto.*;
 import com.nttdata.bootcamp.msaccount.model.Account;
+import com.nttdata.bootcamp.msaccount.model.Transaction;
 import com.nttdata.bootcamp.msaccount.service.impl.AccountServiceImpl;
 import com.nttdata.bootcamp.msaccount.service.impl.TransactionServiceImpl;
 import lombok.extern.log4j.Log4j2;
@@ -103,6 +104,26 @@ public class AccountController {
         return accountService.findById(id)
                 .flatMap(account -> transactionService.getFeeInAPeriod(account.getId(), periodDTO))
                 .switchIfEmpty(Mono.error(new Exception("Account not found")));
+    }
+
+    @GetMapping(value = "/getDailyBalanceReportCurrentMonth/{id}")
+    @ResponseBody
+    public Mono<AccountReportDTO> getDailyBalanceReportCurrentMonth(@PathVariable Long id) {
+        return transactionService.generateAccountReportCurrentMonth(id);
+    }
+
+    @GetMapping(value = "/getDailyBalanceReport/{id}")
+    @ResponseBody
+    public Mono<AccountReportDTO> getDailyBalanceReport(@PathVariable Long id, @RequestBody PeriodDTO periodDTO) {
+        return transactionService.findById(id)
+                .flatMap(account -> transactionService.generateAccountReport(account.getId(), periodDTO))
+                .switchIfEmpty(Mono.error(new Exception("Account not found")));
+    }
+
+    @GetMapping(value = "/getLatestTenTransactions/{id}")
+    @ResponseBody
+    public Flux<Transaction> getLatestTenTransactions(@PathVariable Long id) {
+        return transactionService.findAllByAccountIdDesc(id).take(10);
     }
 
 }

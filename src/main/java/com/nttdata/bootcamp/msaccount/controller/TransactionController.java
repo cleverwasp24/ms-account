@@ -1,5 +1,7 @@
 package com.nttdata.bootcamp.msaccount.controller;
 
+import com.nttdata.bootcamp.msaccount.dto.AccountReportDTO;
+import com.nttdata.bootcamp.msaccount.dto.PeriodDTO;
 import com.nttdata.bootcamp.msaccount.dto.TransactionDTO;
 import com.nttdata.bootcamp.msaccount.dto.TransferDTO;
 import com.nttdata.bootcamp.msaccount.model.Transaction;
