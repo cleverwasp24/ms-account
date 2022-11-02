@@ -109,13 +109,15 @@ public class AccountController {
     @GetMapping(value = "/getDailyBalanceReportCurrentMonth/{id}")
     @ResponseBody
     public Mono<AccountReportDTO> getDailyBalanceReportCurrentMonth(@PathVariable Long id) {
-        return transactionService.generateAccountReportCurrentMonth(id);
+        return accountService.findById(id)
+                .flatMap(account -> transactionService.generateAccountReportCurrentMonth(account.getId()))
+                .switchIfEmpty(Mono.error(new Exception("Account not found")));
     }
 
     @GetMapping(value = "/getDailyBalanceReport/{id}")
     @ResponseBody
     public Mono<AccountReportDTO> getDailyBalanceReport(@PathVariable Long id, @RequestBody PeriodDTO periodDTO) {
-        return transactionService.findById(id)
+        return accountService.findById(id)
                 .flatMap(account -> transactionService.generateAccountReport(account.getId(), periodDTO))
                 .switchIfEmpty(Mono.error(new Exception("Account not found")));
     }
@@ -123,7 +125,17 @@ public class AccountController {
     @GetMapping(value = "/getLatestTenTransactions/{id}")
     @ResponseBody
     public Flux<Transaction> getLatestTenTransactions(@PathVariable Long id) {
-        return transactionService.findAllByAccountIdDesc(id).take(10);
+        return accountService.findById(id)
+                .flatMapMany(account -> transactionService.findAllByAccountIdDesc(account.getId()).take(10))
+                .switchIfEmpty(Mono.error(new Exception("Account not found")));
+    }
+
+    @GetMapping(value = "/getCompleteReport/{id}")
+    @ResponseBody
+    public Mono<CompleteReportDTO> getCompleteReport(@PathVariable Long id, @RequestBody PeriodDTO periodDTO) {
+        return accountService.findById(id)
+                .flatMap(account -> transactionService.generateCompleteReport(account.getId(), periodDTO))
+                .switchIfEmpty(Mono.error(new Exception("Account not found")));
     }
 
 }

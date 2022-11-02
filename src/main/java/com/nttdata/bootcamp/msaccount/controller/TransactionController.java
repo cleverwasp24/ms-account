@@ -91,4 +91,10 @@ public class TransactionController {
         return transactionService.delete(id);
     }
 
+    @GetMapping(value = "/findAllByAccountId/{id}")
+    @ResponseBody
+    public Flux<Transaction> findAllByAccountId(@PathVariable Long id) {
+        return transactionService.findAllByAccountId(id);
+    }
+
 }

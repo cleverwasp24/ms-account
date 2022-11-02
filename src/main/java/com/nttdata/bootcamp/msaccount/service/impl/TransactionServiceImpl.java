@@ -392,6 +392,21 @@ public class TransactionServiceImpl implements TransactionService {
         return Mono.empty();
     }
 
+    @Override
+    public Mono<CompleteReportDTO> generateCompleteReport(Long id, PeriodDTO periodDTO) {
+        log.info("Generating complete report in a period: " + periodDTO.getStart() + " - " + periodDTO.getEnd());
+        Mono<CompleteReportDTO> completeReportDTOMono = Mono.just(new CompleteReportDTO());
+        Mono<Account> accountMono = accountService.findById(id);
+        Flux<Transaction> transactionFlux = findTransactionsAccountPeriod(id, periodDTO.getStart(), periodDTO.getEnd());
+        return completeReportDTOMono.flatMap(r -> accountMono.map(account -> {
+            r.setAccount(account);
+            return r;
+        }).flatMap(r2 -> transactionFlux.collectList().map(transactions -> {
+            r2.setTransactions(transactions);
+            return r2;
+        })));
+    }
+
     /**
      * Este metodo encuentra la última transacción realizada en una cuenta antes de una fecha
      *

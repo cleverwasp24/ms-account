@@ -1,9 +1,6 @@
 package com.nttdata.bootcamp.msaccount.service;
 
-import com.nttdata.bootcamp.msaccount.dto.AccountReportDTO;
-import com.nttdata.bootcamp.msaccount.dto.PeriodDTO;
-import com.nttdata.bootcamp.msaccount.dto.TransactionDTO;
-import com.nttdata.bootcamp.msaccount.dto.TransferDTO;
+import com.nttdata.bootcamp.msaccount.dto.*;
 import com.nttdata.bootcamp.msaccount.model.Transaction;
 import reactor.core.publisher.Flux;
 import reactor.core.publisher.Mono;
@@ -45,6 +42,8 @@ public interface TransactionService {
     Flux<Transaction> findTransactionsAccountPeriod(Long accountId, LocalDateTime start, LocalDateTime end);
 
     Mono<String> checkFields(Transaction transaction);
+
+    Mono<CompleteReportDTO> generateCompleteReport(Long id, PeriodDTO periodDTO);
 
     Mono<Double> getFeeInAPeriod(Long accountId, PeriodDTO periodDTO);
 
