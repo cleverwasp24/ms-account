@@ -1,7 +1,5 @@
 package com.nttdata.bootcamp.msaccount.controller;
 
-import com.nttdata.bootcamp.msaccount.dto.AccountReportDTO;
-import com.nttdata.bootcamp.msaccount.dto.PeriodDTO;
 import com.nttdata.bootcamp.msaccount.dto.TransactionDTO;
 import com.nttdata.bootcamp.msaccount.dto.TransferDTO;
 import com.nttdata.bootcamp.msaccount.model.Transaction;
@@ -16,7 +14,7 @@ import reactor.core.publisher.Mono;
 
 @Log4j2
 @RestController
-@RequestMapping("/bootcamp/transaction")
+@RequestMapping("/bootcamp/accountTransaction")
 public class TransactionController {
 
     @Autowired

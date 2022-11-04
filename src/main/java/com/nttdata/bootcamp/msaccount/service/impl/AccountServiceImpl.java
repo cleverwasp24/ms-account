@@ -4,25 +4,16 @@ import com.nttdata.bootcamp.msaccount.dto.*;
 import com.nttdata.bootcamp.msaccount.infrastructure.AccountRepository;
 import com.nttdata.bootcamp.msaccount.mapper.AccountDTOMapper;
 import com.nttdata.bootcamp.msaccount.model.Account;
-import com.nttdata.bootcamp.msaccount.model.Transaction;
 import com.nttdata.bootcamp.msaccount.model.enums.AccountTypeEnum;
 import com.nttdata.bootcamp.msaccount.model.enums.ClientTypeEnum;
 import com.nttdata.bootcamp.msaccount.service.AccountService;
 import com.nttdata.bootcamp.msaccount.service.CreditCardService;
 import com.nttdata.bootcamp.msaccount.service.DatabaseSequenceService;
-import com.nttdata.bootcamp.msaccount.service.TransactionService;
 import lombok.extern.log4j.Log4j2;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import reactor.core.publisher.Flux;
 import reactor.core.publisher.Mono;
-
-import java.time.LocalDate;
-import java.time.temporal.ChronoUnit;
-import java.util.ArrayList;
-import java.util.Comparator;
-import java.util.HashMap;
-import java.util.stream.Collectors;
 
 @Log4j2
 @Service
