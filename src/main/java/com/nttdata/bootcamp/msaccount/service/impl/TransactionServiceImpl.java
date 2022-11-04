@@ -7,6 +7,7 @@ import com.nttdata.bootcamp.msaccount.model.Account;
 import com.nttdata.bootcamp.msaccount.model.Transaction;
 import com.nttdata.bootcamp.msaccount.model.enums.AccountTypeEnum;
 import com.nttdata.bootcamp.msaccount.model.enums.TransactionTypeEnum;
+import com.nttdata.bootcamp.msaccount.service.AccountService;
 import com.nttdata.bootcamp.msaccount.service.DatabaseSequenceService;
 import com.nttdata.bootcamp.msaccount.service.TransactionService;
 import lombok.extern.log4j.Log4j2;
@@ -33,7 +34,7 @@ public class TransactionServiceImpl implements TransactionService {
     private TransactionRepository transactionRepository;
 
     @Autowired
-    private AccountServiceImpl accountService;
+    private AccountService accountService;
 
     @Autowired
     private DatabaseSequenceService databaseSequenceService;

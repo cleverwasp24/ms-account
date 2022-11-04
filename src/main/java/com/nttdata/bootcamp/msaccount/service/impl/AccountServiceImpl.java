@@ -7,6 +7,7 @@ import com.nttdata.bootcamp.msaccount.model.Account;
 import com.nttdata.bootcamp.msaccount.model.enums.AccountTypeEnum;
 import com.nttdata.bootcamp.msaccount.model.enums.ClientTypeEnum;
 import com.nttdata.bootcamp.msaccount.service.AccountService;
+import com.nttdata.bootcamp.msaccount.service.ClientService;
 import com.nttdata.bootcamp.msaccount.service.CreditCardService;
 import com.nttdata.bootcamp.msaccount.service.DatabaseSequenceService;
 import lombok.extern.log4j.Log4j2;
@@ -23,7 +24,7 @@ public class AccountServiceImpl implements AccountService {
     private AccountRepository accountRepository;
 
     @Autowired
-    private ClientServiceImpl clientService;
+    private ClientService clientService;
 
     @Autowired
     private CreditCardService creditCardService;

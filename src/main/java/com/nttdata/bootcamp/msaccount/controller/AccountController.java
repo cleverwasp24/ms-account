@@ -3,8 +3,8 @@ package com.nttdata.bootcamp.msaccount.controller;
 import com.nttdata.bootcamp.msaccount.dto.*;
 import com.nttdata.bootcamp.msaccount.model.Account;
 import com.nttdata.bootcamp.msaccount.model.Transaction;
-import com.nttdata.bootcamp.msaccount.service.impl.AccountServiceImpl;
-import com.nttdata.bootcamp.msaccount.service.impl.TransactionServiceImpl;
+import com.nttdata.bootcamp.msaccount.service.AccountService;
+import com.nttdata.bootcamp.msaccount.service.TransactionService;
 import lombok.extern.log4j.Log4j2;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
@@ -19,10 +19,10 @@ import reactor.core.publisher.Mono;
 public class AccountController {
 
     @Autowired
-    AccountServiceImpl accountService;
+    AccountService accountService;
 
     @Autowired
-    TransactionServiceImpl transactionService;
+    TransactionService transactionService;
 
     @GetMapping(value = "/findAllAccounts")
     @ResponseBody
