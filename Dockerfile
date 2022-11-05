@@ -1,4 +1,3 @@
 FROM openjdk:17-oracle
-ARG JAR_FILE=target/*.jar
-COPY ${JAR_FILE} ms-account.jar
-ENTRYPOINT ["java","-jar","/ms-account.jar"]
+ADD target/ms-account-0.0.1-SNAPSHOT.jar ms-account.jar
+ENTRYPOINT ["java","-jar","ms-account.jar"]
