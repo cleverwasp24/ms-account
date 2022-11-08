@@ -40,14 +40,18 @@ public class TransactionDTOMapper {
     }
 
     public Transaction generateDestinationAccountTransaction(Transaction transaction) {
-        Transaction destinationTransaction = modelMapper.map(transaction, Transaction.class);
+        Transaction destinationTransaction = new Transaction();
         destinationTransaction.setAccountId(transaction.getDestinationAccountId());
+        destinationTransaction.setDestinationAccountId(transaction.getDestinationAccountId());
+        destinationTransaction.setTransactionType(transaction.getTransactionType());
+        destinationTransaction.setAmount(transaction.getAmount());
         switch (TransactionTypeEnum.valueOf(transaction.getTransactionType())) {
             case TRANSFER_OWN ->
                     destinationTransaction.setDescription("RECEIVE OWN ACCOUNT TRANSFER +$ " + transaction.getAmount());
             case TRANSFER_THIRD ->
                     destinationTransaction.setDescription("RECEIVE THIRD ACCOUNT TRANSFER +$ " + transaction.getAmount());
         }
+        destinationTransaction.setTransactionDate(LocalDateTime.now());
         return destinationTransaction;
     }
 }
